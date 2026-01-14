@@ -118,13 +118,13 @@ resource "aws_iam_instance_profile" "worker" {
 
 ###############################################################################################################
 resource "aws_eks_cluster" "eks" {
-  name = "vishakumar392-eks-01"
+  name     = "eventcart-eks-01"
   role_arn = aws_iam_role.master.arn
 
   vpc_config {
-    subnet_ids = [var.subnet_ids[0],var.subnet_ids[1]]
+    subnet_ids = [var.subnet_ids[0], var.subnet_ids[1]]
   }
-  
+
   depends_on = [
     aws_iam_role_policy_attachment.AmazonEKSClusterPolicy,
     aws_iam_role_policy_attachment.AmazonEKSServicePolicy,
@@ -141,17 +141,17 @@ resource "aws_eks_node_group" "backend" {
   cluster_name    = aws_eks_cluster.eks.name
   node_group_name = "dev"
   node_role_arn   = aws_iam_role.worker.arn
-  subnet_ids = [var.subnet_ids[0],var.subnet_ids[1]]
-  capacity_type = "ON_DEMAND"
-  disk_size = "20"
-  instance_types = ["t2.small"]
+  subnet_ids      = [var.subnet_ids[0], var.subnet_ids[1]]
+  capacity_type   = "ON_DEMAND"
+  disk_size       = "20"
+  instance_types  = ["t2.small"]
   remote_access {
-    ec2_ssh_key = "course2"
+    ec2_ssh_key               = "devops"
     source_security_group_ids = [var.sg_ids]
-  } 
-  
-  labels =  tomap({env = "dev"})
-  
+  }
+
+  labels = tomap({ env = "dev" })
+
   scaling_config {
     desired_size = 2
     max_size     = 3
