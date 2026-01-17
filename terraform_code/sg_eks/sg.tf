@@ -1,27 +1,27 @@
 resource "aws_security_group" "worker_node_sg" {
-  name        = "eks-test"
+  name        = "eks-worker-nodes"
   description = "Security group for EKS worker nodes"
   vpc_id      = var.vpc_id
 
-  # SSH (optional – restrict later)
+  # 🔒 SSH – restrict or remove
   ingress {
-    description = "SSH access"
+    description = "SSH from office IP / bastion only"
     from_port   = 22
     to_port     = 22
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
 
-  # NodePort range (REQUIRED for LoadBalancer services)
+  # ✅ App traffic from NLB (HTTP)
   ingress {
-    description = "NodePort services"
-    from_port   = 30000
-    to_port     = 32767
+    description = "NLB to worker nodes"
+    from_port   = 8080
+    to_port     = 8080
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
 
-  # (Optional but recommended) allow intra-node communication
+  # ✅ Node-to-node communication
   ingress {
     description = "Worker node to worker node"
     from_port   = 0
@@ -30,6 +30,7 @@ resource "aws_security_group" "worker_node_sg" {
     self        = true
   }
 
+  # ✅ Outbound traffic
   egress {
     from_port   = 0
     to_port     = 0
